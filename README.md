@@ -10,7 +10,7 @@ https://github.com/Tencent/ncnn
 
 prebuild apk file can be download from release page
 
-https://github.com/nihui/ncnn-android-benchmark/releases
+https://github.com/nihui/ncnn-android-vkpeak/releases
 
 ## how to build and run
 ### step1
