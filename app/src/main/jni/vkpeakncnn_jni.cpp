@@ -45,8 +45,8 @@ static const char glsl_p1_data[] = R"(
 layout (constant_id = 0) const int count = 0;
 layout (constant_id = 1) const int loop = 1;
 
-layout (binding = 0) readonly buffer a_blob { sfp a_blob_data[]; };
-layout (binding = 1) readonly buffer b_blob { sfp b_blob_data[]; };
+layout (binding = 0) buffer a_blob { sfp a_blob_data[]; };
+layout (binding = 1) buffer b_blob { sfp b_blob_data[]; };
 layout (binding = 2) writeonly buffer c_blob { sfp c_blob_data[]; };
 
 void main()
@@ -73,8 +73,18 @@ void main()
         c = a * c + b;
         c = a * c + b;
         c = a * c + b;
+        c = a * c + b;
+        c = a * c + b;
+        c = a * c + b;
+        c = a * c + b;
+        c = a * c + b;
+        c = a * c + b;
+        c = a * c + b;
+        c = a * c + b;
     }
 
+    buffer_st1(a_blob_data, gx, a);
+    buffer_st1(b_blob_data, gx, b);
     buffer_st1(c_blob_data, gx, c);
 }
 )";
@@ -92,8 +102,8 @@ static const char glsl_p4_data[] = R"(
 layout (constant_id = 0) const int count = 0;
 layout (constant_id = 1) const int loop = 1;
 
-layout (binding = 0) readonly buffer a_blob { sfpvec4 a_blob_data[]; };
-layout (binding = 1) readonly buffer b_blob { sfpvec4 b_blob_data[]; };
+layout (binding = 0) buffer a_blob { sfpvec4 a_blob_data[]; };
+layout (binding = 1) buffer b_blob { sfpvec4 b_blob_data[]; };
 layout (binding = 2) writeonly buffer c_blob { sfpvec4 c_blob_data[]; };
 
 void main()
@@ -120,8 +130,18 @@ void main()
         c = a * c + b;
         c = a * c + b;
         c = a * c + b;
+        c = a * c + b;
+        c = a * c + b;
+        c = a * c + b;
+        c = a * c + b;
+        c = a * c + b;
+        c = a * c + b;
+        c = a * c + b;
+        c = a * c + b;
     }
 
+    buffer_st4(a_blob_data, gx, a);
+    buffer_st4(b_blob_data, gx, b);
     buffer_st4(c_blob_data, gx, c);
 }
 )";
@@ -139,8 +159,8 @@ static const char glsl_p8_data[] = R"(
 layout (constant_id = 0) const int count = 0;
 layout (constant_id = 1) const int loop = 1;
 
-layout (binding = 0) readonly buffer a_blob { sfpvec8 a_blob_data[]; };
-layout (binding = 1) readonly buffer b_blob { sfpvec8 b_blob_data[]; };
+layout (binding = 0) buffer a_blob { sfpvec8 a_blob_data[]; };
+layout (binding = 1) buffer b_blob { sfpvec8 b_blob_data[]; };
 layout (binding = 2) writeonly buffer c_blob { sfpvec8 c_blob_data[]; };
 
 void main()
@@ -175,9 +195,233 @@ void main()
         c[1] = a[1] * c[1] + b[1];
         c[0] = a[0] * c[0] + b[0];
         c[1] = a[1] * c[1] + b[1];
+        c[0] = a[0] * c[0] + b[0];
+        c[1] = a[1] * c[1] + b[1];
+        c[0] = a[0] * c[0] + b[0];
+        c[1] = a[1] * c[1] + b[1];
+        c[0] = a[0] * c[0] + b[0];
+        c[1] = a[1] * c[1] + b[1];
+        c[0] = a[0] * c[0] + b[0];
+        c[1] = a[1] * c[1] + b[1];
+        c[0] = a[0] * c[0] + b[0];
+        c[1] = a[1] * c[1] + b[1];
+        c[0] = a[0] * c[0] + b[0];
+        c[1] = a[1] * c[1] + b[1];
+        c[0] = a[0] * c[0] + b[0];
+        c[1] = a[1] * c[1] + b[1];
+        c[0] = a[0] * c[0] + b[0];
+        c[1] = a[1] * c[1] + b[1];
     }
 
+    buffer_st8(a_blob_data, gx, a);
+    buffer_st8(b_blob_data, gx, b);
     buffer_st8(c_blob_data, gx, c);
+}
+)";
+
+static const char glsl_int32_p1_data[] = R"(
+#version 450
+
+layout (constant_id = 0) const int count = 0;
+layout (constant_id = 1) const int loop = 1;
+
+layout (binding = 0) buffer a_blob { int a_blob_data[]; };
+layout (binding = 1) buffer b_blob { int b_blob_data[]; };
+layout (binding = 2) writeonly buffer c_blob { int c_blob_data[]; };
+
+void main()
+{
+    int gx = int(gl_GlobalInvocationID.x);
+    int gy = int(gl_GlobalInvocationID.y);
+    int gz = int(gl_GlobalInvocationID.z);
+
+    if (gx >= count || gy >= 1 || gz >= 1)
+        return;
+
+    int a = a_blob_data[gx];
+    int b = b_blob_data[gx];
+
+    int c = int(1);
+
+    for (int i = 0; i < loop; i++)
+    {
+        c = a * c + b;
+        c = a * c + b;
+        c = a * c + b;
+        c = a * c + b;
+        c = a * c + b;
+        c = a * c + b;
+        c = a * c + b;
+        c = a * c + b;
+        c = a * c + b;
+        c = a * c + b;
+        c = a * c + b;
+        c = a * c + b;
+        c = a * c + b;
+        c = a * c + b;
+        c = a * c + b;
+        c = a * c + b;
+    }
+
+    a_blob_data[gx] = a;
+    b_blob_data[gx] = b;
+    c_blob_data[gx] = c;
+}
+)";
+
+static const char glsl_int32_p4_data[] = R"(
+#version 450
+
+layout (constant_id = 0) const int count = 0;
+layout (constant_id = 1) const int loop = 1;
+
+layout (binding = 0) buffer a_blob { ivec4 a_blob_data[]; };
+layout (binding = 1) buffer b_blob { ivec4 b_blob_data[]; };
+layout (binding = 2) writeonly buffer c_blob { ivec4 c_blob_data[]; };
+
+void main()
+{
+    int gx = int(gl_GlobalInvocationID.x);
+    int gy = int(gl_GlobalInvocationID.y);
+    int gz = int(gl_GlobalInvocationID.z);
+
+    if (gx >= count || gy >= 1 || gz >= 1)
+        return;
+
+    ivec4 a = a_blob_data[gx];
+    ivec4 b = b_blob_data[gx];
+
+    ivec4 c = ivec4(1);
+
+    for (int i = 0; i < loop; i++)
+    {
+        c = a * c + b;
+        c = a * c + b;
+        c = a * c + b;
+        c = a * c + b;
+        c = a * c + b;
+        c = a * c + b;
+        c = a * c + b;
+        c = a * c + b;
+        c = a * c + b;
+        c = a * c + b;
+        c = a * c + b;
+        c = a * c + b;
+        c = a * c + b;
+        c = a * c + b;
+        c = a * c + b;
+        c = a * c + b;
+    }
+
+    a_blob_data[gx] = a;
+    b_blob_data[gx] = b;
+    c_blob_data[gx] = c;
+}
+)";
+
+static const char glsl_int16_p1_data[] = R"(
+#version 450
+
+#extension GL_EXT_shader_16bit_storage: require
+#extension GL_EXT_shader_explicit_arithmetic_types_int16: require
+
+layout (constant_id = 0) const int count = 0;
+layout (constant_id = 1) const int loop = 1;
+
+layout (binding = 0) buffer a_blob { int16_t a_blob_data[]; };
+layout (binding = 1) buffer b_blob { int16_t b_blob_data[]; };
+layout (binding = 2) writeonly buffer c_blob { int16_t c_blob_data[]; };
+
+void main()
+{
+    int gx = int(gl_GlobalInvocationID.x);
+    int gy = int(gl_GlobalInvocationID.y);
+    int gz = int(gl_GlobalInvocationID.z);
+
+    if (gx >= count || gy >= 1 || gz >= 1)
+        return;
+
+    int16_t a = a_blob_data[gx];
+    int16_t b = b_blob_data[gx];
+
+    int16_t c = int16_t(1);
+
+    for (int i = 0; i < loop; i++)
+    {
+        c = a * c + b;
+        c = a * c + b;
+        c = a * c + b;
+        c = a * c + b;
+        c = a * c + b;
+        c = a * c + b;
+        c = a * c + b;
+        c = a * c + b;
+        c = a * c + b;
+        c = a * c + b;
+        c = a * c + b;
+        c = a * c + b;
+        c = a * c + b;
+        c = a * c + b;
+        c = a * c + b;
+        c = a * c + b;
+    }
+
+    a_blob_data[gx] = a;
+    b_blob_data[gx] = b;
+    c_blob_data[gx] = c;
+}
+)";
+
+static const char glsl_int16_p4_data[] = R"(
+#version 450
+
+#extension GL_EXT_shader_16bit_storage: require
+#extension GL_EXT_shader_explicit_arithmetic_types_int16: require
+
+layout (constant_id = 0) const int count = 0;
+layout (constant_id = 1) const int loop = 1;
+
+layout (binding = 0) buffer a_blob { i16vec4 a_blob_data[]; };
+layout (binding = 1) buffer b_blob { i16vec4 b_blob_data[]; };
+layout (binding = 2) writeonly buffer c_blob { i16vec4 c_blob_data[]; };
+
+void main()
+{
+    int gx = int(gl_GlobalInvocationID.x);
+    int gy = int(gl_GlobalInvocationID.y);
+    int gz = int(gl_GlobalInvocationID.z);
+
+    if (gx >= count || gy >= 1 || gz >= 1)
+        return;
+
+    i16vec4 a = a_blob_data[gx];
+    i16vec4 b = b_blob_data[gx];
+
+    i16vec4 c = i16vec4(1);
+
+    for (int i = 0; i < loop; i++)
+    {
+        c = a * c + b;
+        c = a * c + b;
+        c = a * c + b;
+        c = a * c + b;
+        c = a * c + b;
+        c = a * c + b;
+        c = a * c + b;
+        c = a * c + b;
+        c = a * c + b;
+        c = a * c + b;
+        c = a * c + b;
+        c = a * c + b;
+        c = a * c + b;
+        c = a * c + b;
+        c = a * c + b;
+        c = a * c + b;
+    }
+
+    a_blob_data[gx] = a;
+    b_blob_data[gx] = b;
+    c_blob_data[gx] = c;
 }
 )";
 
@@ -194,11 +438,19 @@ static float vkpeak(int loop, int count_mb, int cmd_loop, int storage_type, int 
         return -1;
     }
 
-    if (!vkdev->info.support_fp16_storage && storage_type == 2)
+    if (!vkdev->info.support_fp16_storage() && storage_type == 2)
     {
         return -233;
     }
-    if (!vkdev->info.support_fp16_arithmetic && arithmetic_type == 1)
+    if (!vkdev->info.support_fp16_storage() && storage_type == 4)
+    {
+        return -233;
+    }
+    if (!vkdev->info.support_fp16_arithmetic() && arithmetic_type == 1)
+    {
+        return -233;
+    }
+    if (!vkdev->info.support_fp16_arithmetic() && arithmetic_type == 3)
     {
         return -233;
     }
@@ -215,7 +467,13 @@ static float vkpeak(int loop, int count_mb, int cmd_loop, int storage_type, int 
     // setup pipeline
     ncnn::Pipeline pipeline(vkdev);
     {
-        int local_size_x = std::min(128, std::max(32, (int)vkdev->info.subgroup_size));
+        int local_size_x = std::min(128, std::max(32, (int)vkdev->info.subgroup_size()));
+
+        // adreno fp16a double subgroup_size
+        if (vkdev->info.vendor_id() == 0x5143 && arithmetic_type == 1)
+        {
+            local_size_x *= 2;
+        }
 
         pipeline.set_local_size_xyz(local_size_x, 1, 1);
 
@@ -226,17 +484,42 @@ static float vkpeak(int loop, int count_mb, int cmd_loop, int storage_type, int 
         // glsl to spirv
         // -1 for omit the tail '\0'
         std::vector<uint32_t> spirv;
-        if (packing_type == 0)
+        if (storage_type == 3)
         {
-            ncnn::compile_spirv_module(glsl_p1_data, sizeof(glsl_p1_data) - 1, opt, spirv);
+            if (packing_type == 0)
+            {
+                ncnn::compile_spirv_module(glsl_int32_p1_data, sizeof(glsl_int32_p1_data) - 1, opt, spirv);
+            }
+            if (packing_type == 1)
+            {
+                ncnn::compile_spirv_module(glsl_int32_p4_data, sizeof(glsl_int32_p4_data) - 1, opt, spirv);
+            }
         }
-        if (packing_type == 1)
+        else if (storage_type == 4)
         {
-            ncnn::compile_spirv_module(glsl_p4_data, sizeof(glsl_p4_data) - 1, opt, spirv);
+            if (packing_type == 0)
+            {
+                ncnn::compile_spirv_module(glsl_int16_p1_data, sizeof(glsl_int16_p1_data) - 1, opt, spirv);
+            }
+            if (packing_type == 1)
+            {
+                ncnn::compile_spirv_module(glsl_int16_p4_data, sizeof(glsl_int16_p4_data) - 1, opt, spirv);
+            }
         }
-        if (packing_type == 2)
+        else
         {
-            ncnn::compile_spirv_module(glsl_p8_data, sizeof(glsl_p8_data) - 1, opt, spirv);
+            if (packing_type == 0)
+            {
+                ncnn::compile_spirv_module(glsl_p1_data, sizeof(glsl_p1_data) - 1, opt, spirv);
+            }
+            if (packing_type == 1)
+            {
+                ncnn::compile_spirv_module(glsl_p4_data, sizeof(glsl_p4_data) - 1, opt, spirv);
+            }
+            if (packing_type == 2)
+            {
+                ncnn::compile_spirv_module(glsl_p8_data, sizeof(glsl_p8_data) - 1, opt, spirv);
+            }
         }
 
         pipeline.create(spirv.data(), spirv.size() * 4, specializations);
@@ -250,7 +533,7 @@ static float vkpeak(int loop, int count_mb, int cmd_loop, int storage_type, int 
     ncnn::VkMat b;
     ncnn::VkMat c;
     {
-        if (opt.use_fp16_packed || opt.use_fp16_storage)
+        if (opt.use_fp16_packed || opt.use_fp16_storage || storage_type == 4)
         {
             a.create(count, (size_t)(2u * elempack), elempack, allocator);
             b.create(count, (size_t)(2u * elempack), elempack, allocator);
@@ -292,7 +575,7 @@ static float vkpeak(int loop, int count_mb, int cmd_loop, int storage_type, int 
 
             double time = ncnn::get_current_time() - t0;
 
-            const double mac = (double)count * (double)loop * 8 * elempack * 2;
+            const double mac = (double)count * (double)loop * 16 * elempack * 2;
 
             double gflops = mac / time / 1000000;
 
@@ -352,7 +635,7 @@ JNIEXPORT jstring JNICALL Java_com_tencent_vkpeakncnn_VkPeakNcnn_GetVkDevice(JNI
         return env->NewStringUTF("No vulkan device");
     }
 
-    return env->NewStringUTF(vkdev->info.device_name.c_str());
+    return env->NewStringUTF(vkdev->info.device_name());
 }
 
 // public native String GetApiVersion();
@@ -364,7 +647,7 @@ JNIEXPORT jstring JNICALL Java_com_tencent_vkpeakncnn_VkPeakNcnn_GetApiVersion(J
         return env->NewStringUTF("No vulkan device");
     }
 
-    uint32_t api_version = vkdev->info.api_version;
+    uint32_t api_version = vkdev->info.api_version();
 
     char tmp[128];
     sprintf(tmp, "%u.%u.%u", VK_VERSION_MAJOR(api_version), VK_VERSION_MINOR(api_version), VK_VERSION_PATCH(api_version));
@@ -381,7 +664,7 @@ JNIEXPORT jstring JNICALL Java_com_tencent_vkpeakncnn_VkPeakNcnn_GetDriverVersio
         return env->NewStringUTF("No vulkan device");
     }
 
-    uint32_t driver_version = vkdev->info.driver_version;
+    uint32_t driver_version = vkdev->info.driver_version();
 
     char tmp[128];
     sprintf(tmp, "%u.%u.%u", VK_VERSION_MAJOR(driver_version), VK_VERSION_MINOR(driver_version), VK_VERSION_PATCH(driver_version));

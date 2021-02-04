@@ -51,6 +51,10 @@ public class MainActivity extends Activity
     private TextView textviewFP16s;
     private TextView textviewFP16sv4;
     private TextView textviewFP16sv8;
+    private TextView textviewINT32;
+    private TextView textviewINT32v4;
+    private TextView textviewINT16;
+    private TextView textviewINT16v4;
 
     private float fp32;
     private float fp32v4;
@@ -60,6 +64,10 @@ public class MainActivity extends Activity
     private float fp16s;
     private float fp16sv4;
     private float fp16sv8;
+    private float int32;
+    private float int32v4;
+    private float int16;
+    private float int16v4;
 
     /** Called when the activity is first created. */
     @Override
@@ -68,7 +76,7 @@ public class MainActivity extends Activity
         super.onCreate(savedInstanceState);
         setContentView(R.layout.main);
 
-        setTitle("ncnn Vulkan FLOPS");
+        setTitle("ncnn Vulkan peak OPS");
 
         textviewModel = (TextView) findViewById(R.id.textviewModel);
         textviewAndroid = (TextView) findViewById(R.id.textviewAndroid);
@@ -98,6 +106,10 @@ public class MainActivity extends Activity
         textviewFP16s = (TextView) findViewById(R.id.textviewFP16s);
         textviewFP16sv4 = (TextView) findViewById(R.id.textviewFP16sv4);
         textviewFP16sv8 = (TextView) findViewById(R.id.textviewFP16sv8);
+        textviewINT32 = (TextView) findViewById(R.id.textviewINT32);
+        textviewINT32v4 = (TextView) findViewById(R.id.textviewINT32v4);
+        textviewINT16 = (TextView) findViewById(R.id.textviewINT16);
+        textviewINT16v4 = (TextView) findViewById(R.id.textviewINT16v4);
 
         // apply default settings
         spinnerMacs.setSelection(1);
@@ -108,6 +120,7 @@ public class MainActivity extends Activity
         buttonRun.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View arg0) {
+                getWindow().addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
                 getWindow().setFlags(WindowManager.LayoutParams.FLAG_NOT_TOUCHABLE, WindowManager.LayoutParams.FLAG_NOT_TOUCHABLE);
 
                 new Thread(new Runnable() {
@@ -149,8 +162,26 @@ public class MainActivity extends Activity
                         fp16sv8 = vkpeakncnn.Run(loop, count_mb, cmd_loop, 2, 1, 2);
                         textviewFP16sv8.post(new Runnable() { public void run() { textviewFP16sv8.setText(textHelper(fp16sv8)); } });
 
+                        sleep(500);
+                        int32 = vkpeakncnn.Run(loop, count_mb, cmd_loop, 3, 2, 0);
+                        textviewINT32.post(new Runnable() { public void run() { textviewINT32.setText(textHelper(int32)); } });
 
-                        textviewFP16sv8.post(new Runnable() { public void run() { getWindow().clearFlags(WindowManager.LayoutParams.FLAG_NOT_TOUCHABLE); } });
+                        sleep(500);
+                        int32v4 = vkpeakncnn.Run(loop, count_mb, cmd_loop, 3, 2, 1);
+                        textviewINT32v4.post(new Runnable() { public void run() { textviewINT32v4.setText(textHelper(int32v4)); } });
+
+                        sleep(500);
+                        int16 = vkpeakncnn.Run(loop, count_mb, cmd_loop, 4, 3, 0);
+                        textviewINT16.post(new Runnable() { public void run() { textviewINT16.setText(textHelper(int16)); } });
+
+                        sleep(500);
+                        int16v4 = vkpeakncnn.Run(loop, count_mb, cmd_loop, 4, 3, 1);
+                        textviewINT16v4.post(new Runnable() { public void run() { textviewINT16v4.setText(textHelper(int16v4)); } });
+
+                        textviewINT16v4.post(new Runnable() { public void run() {
+                            getWindow().clearFlags(WindowManager.LayoutParams.FLAG_NOT_TOUCHABLE);
+                            getWindow().clearFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
+                        } });
                     }
                 }).start();
             }

@@ -62,7 +62,7 @@
 
     <TextView
         android:layout_gravity="right"
-        android:text="MACs(8x)" />
+        android:text="MACs(16x)" />
 
     <Spinner
         android:id="@+id/spinnerMacs"
@@ -97,7 +97,7 @@
 
     <TextView
         android:layout_gravity="left"
-        android:text="GFLOPS" />
+        android:text="GFLOPS / GIOPS" />
 
     <TextView
         android:layout_gravity="right"
@@ -161,6 +161,38 @@
 
     <TextView
         android:id="@+id/textviewFP16sv8"
+        android:layout_gravity="left" />
+
+    <TextView
+        android:layout_gravity="right"
+        android:text="INT32 scalar" />
+
+    <TextView
+        android:id="@+id/textviewINT32"
+        android:layout_gravity="left" />
+
+    <TextView
+        android:layout_gravity="right"
+        android:text="INT32 vec4" />
+
+    <TextView
+        android:id="@+id/textviewINT32v4"
+        android:layout_gravity="left" />
+
+    <TextView
+        android:layout_gravity="right"
+        android:text="INT16 scalar" />
+
+    <TextView
+        android:id="@+id/textviewINT16"
+        android:layout_gravity="left" />
+
+    <TextView
+        android:layout_gravity="right"
+        android:text="INT16 vec4" />
+
+    <TextView
+        android:id="@+id/textviewINT16v4"
         android:layout_gravity="left" />
 
 </GridLayout>
