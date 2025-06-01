@@ -26,9 +26,10 @@ public class VkPeakNcnn
     public native String GetApiVersion();
     public native String GetDriverVersion();
 
-    // storage_type     = 0/1/2/3/4 = fp32 fp16p fp16s int32 int16
-    // arithmetic_type  = 0/1/2/3   = fp32 fp16 int32 int16
-    // packing_type     = 0/1/2     = scalar vec4 vec8
+    // device_id        = 0
+    // storage_type     = 0/1/2/3/4/5/6 = fp32 fp16 fp64 int32 int16 int8 bf16
+    // arithmetic_type  = 0/1/2/3/4/5/6 = fp32 fp16 fp64 int32 int16 int8 bf16
+    // packing_type     = 1/4/256       = scalar vec4/dotprod matrix
     public native float Run(int loop, int count_mb, int cmd_loop, int storage_type, int arithmetic_type, int packing_type);
 
     static {

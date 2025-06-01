@@ -1,0 +1,3 @@
+[submodule "app/src/main/jni/ncnn"]
+	path = app/src/main/jni/ncnn
+	url = https://github.com/Tencent/ncnn

@@ -101,7 +101,7 @@
 
     <TextView
         android:layout_gravity="right"
-        android:text="FP32 scalar" />
+        android:text="fp32-scalar" />
 
     <TextView
         android:id="@+id/textviewFP32"
@@ -109,7 +109,7 @@
 
     <TextView
         android:layout_gravity="right"
-        android:text="FP32 vec4" />
+        android:text="fp32-vec4" />
 
     <TextView
         android:id="@+id/textviewFP32v4"
@@ -117,55 +117,47 @@
 
     <TextView
         android:layout_gravity="right"
-        android:text="FP32 vec8" />
+        android:text="fp16-scalar" />
 
     <TextView
-        android:id="@+id/textviewFP32v8"
+        android:id="@+id/textviewFP16"
         android:layout_gravity="left" />
 
     <TextView
         android:layout_gravity="right"
-        android:text="FP16p vec4" />
+        android:text="fp16-vec4" />
 
     <TextView
-        android:id="@+id/textviewFP16pv4"
+        android:id="@+id/textviewFP16v4"
         android:layout_gravity="left" />
 
     <TextView
         android:layout_gravity="right"
-        android:text="FP16p vec8" />
+        android:text="fp16-matrix" />
 
     <TextView
-        android:id="@+id/textviewFP16pv8"
+        android:id="@+id/textviewFP16mm"
         android:layout_gravity="left" />
 
     <TextView
         android:layout_gravity="right"
-        android:text="FP16s scalar" />
+        android:text="fp64-scalar" />
 
     <TextView
-        android:id="@+id/textviewFP16s"
+        android:id="@+id/textviewFP64"
         android:layout_gravity="left" />
 
     <TextView
         android:layout_gravity="right"
-        android:text="FP16s vec4" />
+        android:text="fp64-vec4" />
 
     <TextView
-        android:id="@+id/textviewFP16sv4"
+        android:id="@+id/textviewFP64v4"
         android:layout_gravity="left" />
 
     <TextView
         android:layout_gravity="right"
-        android:text="FP16s vec8" />
-
-    <TextView
-        android:id="@+id/textviewFP16sv8"
-        android:layout_gravity="left" />
-
-    <TextView
-        android:layout_gravity="right"
-        android:text="INT32 scalar" />
+        android:text="int32-scalar" />
 
     <TextView
         android:id="@+id/textviewINT32"
@@ -173,7 +165,7 @@
 
     <TextView
         android:layout_gravity="right"
-        android:text="INT32 vec4" />
+        android:text="int32-vec4" />
 
     <TextView
         android:id="@+id/textviewINT32v4"
@@ -181,7 +173,7 @@
 
     <TextView
         android:layout_gravity="right"
-        android:text="INT16 scalar" />
+        android:text="int16-scalar" />
 
     <TextView
         android:id="@+id/textviewINT16"
@@ -189,10 +181,42 @@
 
     <TextView
         android:layout_gravity="right"
-        android:text="INT16 vec4" />
+        android:text="int16-vec4" />
 
     <TextView
         android:id="@+id/textviewINT16v4"
+        android:layout_gravity="left" />
+
+    <TextView
+        android:layout_gravity="right"
+        android:text="int8-dotprod" />
+
+    <TextView
+        android:id="@+id/textviewINT8dp"
+        android:layout_gravity="left" />
+
+    <TextView
+        android:layout_gravity="right"
+        android:text="int8-matrix" />
+
+    <TextView
+        android:id="@+id/textviewINT8mm"
+        android:layout_gravity="left" />
+
+    <TextView
+        android:layout_gravity="right"
+        android:text="bf16-dotprod" />
+
+    <TextView
+        android:id="@+id/textviewBF16dp"
+        android:layout_gravity="left" />
+
+    <TextView
+        android:layout_gravity="right"
+        android:text="bf16-matrix" />
+
+    <TextView
+        android:id="@+id/textviewBF16mm"
         android:layout_gravity="left" />
 
 </GridLayout>

@@ -45,29 +45,35 @@ public class MainActivity extends Activity
 
     private TextView textviewFP32;
     private TextView textviewFP32v4;
-    private TextView textviewFP32v8;
-    private TextView textviewFP16pv4;
-    private TextView textviewFP16pv8;
-    private TextView textviewFP16s;
-    private TextView textviewFP16sv4;
-    private TextView textviewFP16sv8;
+    private TextView textviewFP16;
+    private TextView textviewFP16v4;
+    private TextView textviewFP16mm;
+    private TextView textviewFP64;
+    private TextView textviewFP64v4;
     private TextView textviewINT32;
     private TextView textviewINT32v4;
     private TextView textviewINT16;
     private TextView textviewINT16v4;
+    private TextView textviewINT8dp;
+    private TextView textviewINT8mm;
+    private TextView textviewBF16dp;
+    private TextView textviewBF16mm;
 
     private float fp32;
     private float fp32v4;
-    private float fp32v8;
-    private float fp16pv4;
-    private float fp16pv8;
-    private float fp16s;
-    private float fp16sv4;
-    private float fp16sv8;
+    private float fp16;
+    private float fp16v4;
+    private float fp16mm;
+    private float fp64;
+    private float fp64v4;
     private float int32;
     private float int32v4;
     private float int16;
     private float int16v4;
+    private float int8dp;
+    private float int8mm;
+    private float bf16dp;
+    private float bf16mm;
 
     /** Called when the activity is first created. */
     @Override
@@ -100,16 +106,19 @@ public class MainActivity extends Activity
 
         textviewFP32 = (TextView) findViewById(R.id.textviewFP32);
         textviewFP32v4 = (TextView) findViewById(R.id.textviewFP32v4);
-        textviewFP32v8 = (TextView) findViewById(R.id.textviewFP32v8);
-        textviewFP16pv4 = (TextView) findViewById(R.id.textviewFP16pv4);
-        textviewFP16pv8 = (TextView) findViewById(R.id.textviewFP16pv8);
-        textviewFP16s = (TextView) findViewById(R.id.textviewFP16s);
-        textviewFP16sv4 = (TextView) findViewById(R.id.textviewFP16sv4);
-        textviewFP16sv8 = (TextView) findViewById(R.id.textviewFP16sv8);
+        textviewFP16 = (TextView) findViewById(R.id.textviewFP16);
+        textviewFP16v4 = (TextView) findViewById(R.id.textviewFP16v4);
+        textviewFP16mm = (TextView) findViewById(R.id.textviewFP16mm);
+        textviewFP64 = (TextView) findViewById(R.id.textviewFP64);
+        textviewFP64v4 = (TextView) findViewById(R.id.textviewFP64v4);
         textviewINT32 = (TextView) findViewById(R.id.textviewINT32);
         textviewINT32v4 = (TextView) findViewById(R.id.textviewINT32v4);
         textviewINT16 = (TextView) findViewById(R.id.textviewINT16);
         textviewINT16v4 = (TextView) findViewById(R.id.textviewINT16v4);
+        textviewINT8dp = (TextView) findViewById(R.id.textviewINT8dp);
+        textviewINT8mm = (TextView) findViewById(R.id.textviewINT8mm);
+        textviewBF16dp = (TextView) findViewById(R.id.textviewBF16dp);
+        textviewBF16mm = (TextView) findViewById(R.id.textviewBF16mm);
 
         // apply default settings
         spinnerMacs.setSelection(1);
@@ -131,54 +140,66 @@ public class MainActivity extends Activity
                         int cmd_loop = Integer.parseInt(spinnerLoops.getSelectedItem().toString());
 
                         sleep(500);
-                        fp32 = vkpeakncnn.Run(loop, count_mb, cmd_loop, 0, 0, 0);
+                        fp32 = vkpeakncnn.Run(loop, count_mb, cmd_loop, 0, 0, 1);
                         textviewFP32.post(new Runnable() { public void run() { textviewFP32.setText(textHelper(fp32)); } });
 
                         sleep(500);
-                        fp32v4 = vkpeakncnn.Run(loop, count_mb, cmd_loop, 0, 0, 1);
+                        fp32v4 = vkpeakncnn.Run(loop, count_mb, cmd_loop, 0, 0, 4);
                         textviewFP32v4.post(new Runnable() { public void run() { textviewFP32v4.setText(textHelper(fp32v4)); } });
 
                         sleep(500);
-                        fp32v8 = vkpeakncnn.Run(loop, count_mb, cmd_loop, 0, 0, 2);
-                        textviewFP32v8.post(new Runnable() { public void run() { textviewFP32v8.setText(textHelper(fp32v8)); } });
+                        fp16 = vkpeakncnn.Run(loop, count_mb, cmd_loop, 0, 1, 1);
+                        textviewFP16.post(new Runnable() { public void run() { textviewFP16.setText(textHelper(fp16)); } });
 
                         sleep(500);
-                        fp16pv4 = vkpeakncnn.Run(loop, count_mb, cmd_loop, 1, 1, 1);
-                        textviewFP16pv4.post(new Runnable() { public void run() { textviewFP16pv4.setText(textHelper(fp16pv4)); } });
+                        fp16v4 = vkpeakncnn.Run(loop, count_mb, cmd_loop, 0, 1, 4);
+                        textviewFP16v4.post(new Runnable() { public void run() { textviewFP16v4.setText(textHelper(fp16v4)); } });
 
                         sleep(500);
-                        fp16pv8 = vkpeakncnn.Run(loop, count_mb, cmd_loop, 1, 1, 2);
-                        textviewFP16pv8.post(new Runnable() { public void run() { textviewFP16pv8.setText(textHelper(fp16pv8)); } });
+                        fp16mm = vkpeakncnn.Run(loop, count_mb, cmd_loop, 1, 1, 256);
+                        textviewFP16mm.post(new Runnable() { public void run() { textviewFP16mm.setText(textHelper(fp16mm)); } });
 
                         sleep(500);
-                        fp16s = vkpeakncnn.Run(loop, count_mb, cmd_loop, 2, 1, 0);
-                        textviewFP16s.post(new Runnable() { public void run() { textviewFP16s.setText(textHelper(fp16s)); } });
+                        fp64 = vkpeakncnn.Run(loop, count_mb, cmd_loop, 2, 2, 1);
+                        textviewFP64.post(new Runnable() { public void run() { textviewFP64.setText(textHelper(fp64)); } });
 
                         sleep(500);
-                        fp16sv4 = vkpeakncnn.Run(loop, count_mb, cmd_loop, 2, 1, 1);
-                        textviewFP16sv4.post(new Runnable() { public void run() { textviewFP16sv4.setText(textHelper(fp16sv4)); } });
+                        fp64v4 = vkpeakncnn.Run(loop, count_mb, cmd_loop, 2, 2, 4);
+                        textviewFP64v4.post(new Runnable() { public void run() { textviewFP64v4.setText(textHelper(fp64v4)); } });
 
                         sleep(500);
-                        fp16sv8 = vkpeakncnn.Run(loop, count_mb, cmd_loop, 2, 1, 2);
-                        textviewFP16sv8.post(new Runnable() { public void run() { textviewFP16sv8.setText(textHelper(fp16sv8)); } });
-
-                        sleep(500);
-                        int32 = vkpeakncnn.Run(loop, count_mb, cmd_loop, 3, 2, 0);
+                        int32 = vkpeakncnn.Run(loop, count_mb, cmd_loop, 3, 3, 1);
                         textviewINT32.post(new Runnable() { public void run() { textviewINT32.setText(textHelper(int32)); } });
 
                         sleep(500);
-                        int32v4 = vkpeakncnn.Run(loop, count_mb, cmd_loop, 3, 2, 1);
+                        int32v4 = vkpeakncnn.Run(loop, count_mb, cmd_loop, 3, 3, 4);
                         textviewINT32v4.post(new Runnable() { public void run() { textviewINT32v4.setText(textHelper(int32v4)); } });
 
                         sleep(500);
-                        int16 = vkpeakncnn.Run(loop, count_mb, cmd_loop, 4, 3, 0);
+                        int16 = vkpeakncnn.Run(loop, count_mb, cmd_loop, 3, 4, 1);
                         textviewINT16.post(new Runnable() { public void run() { textviewINT16.setText(textHelper(int16)); } });
 
                         sleep(500);
-                        int16v4 = vkpeakncnn.Run(loop, count_mb, cmd_loop, 4, 3, 1);
+                        int16v4 = vkpeakncnn.Run(loop, count_mb, cmd_loop, 3, 4, 4);
                         textviewINT16v4.post(new Runnable() { public void run() { textviewINT16v4.setText(textHelper(int16v4)); } });
 
-                        textviewINT16v4.post(new Runnable() { public void run() {
+                        sleep(500);
+                        int8dp = vkpeakncnn.Run(loop, count_mb, cmd_loop, 3, 5, 4);
+                        textviewINT8dp.post(new Runnable() { public void run() { textviewINT8dp.setText(textHelper(int8dp)); } });
+
+                        sleep(500);
+                        int8mm = vkpeakncnn.Run(loop, count_mb, cmd_loop, 3, 5, 256);
+                        textviewINT8mm.post(new Runnable() { public void run() { textviewINT8mm.setText(textHelper(int8mm)); } });
+
+                        sleep(500);
+                        bf16dp = vkpeakncnn.Run(loop, count_mb, cmd_loop, 0, 6, 4);
+                        textviewBF16dp.post(new Runnable() { public void run() { textviewBF16dp.setText(textHelper(bf16dp)); } });
+
+                        sleep(500);
+                        bf16mm = vkpeakncnn.Run(loop, count_mb, cmd_loop, 0, 6, 256);
+                        textviewBF16mm.post(new Runnable() { public void run() { textviewBF16mm.setText(textHelper(bf16mm)); } });
+
+                        textviewBF16mm.post(new Runnable() { public void run() {
                             getWindow().clearFlags(WindowManager.LayoutParams.FLAG_NOT_TOUCHABLE);
                             getWindow().clearFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
                         } });
