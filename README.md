@@ -1,5 +1,7 @@
 # ncnn-android-vkpeak
 
+![download](https://img.shields.io/github/downloads/nihui/ncnn-android-vkpeak/total.svg)
+
 The ncnn android vulkan peak FLOPS app
 
 ## download apk
