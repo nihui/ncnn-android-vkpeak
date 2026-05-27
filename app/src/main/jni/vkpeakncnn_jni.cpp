@@ -1593,6 +1593,13 @@ static double vkpeak(int loop, int count_mb, int cmd_loop, int storage_type, int
         buffer_size = std::min(buffer_size, 128 * 1024 * 1024);
     }
 
+    // sanitize buffer_size for 0.9x hardware limits
+    {
+        const VkPhysicalDeviceProperties& p = vkdev->info.physicalDeviceProperties();
+        uint32_t max_buffer_size = (uint32_t)(p.limits.maxStorageBufferRange * 0.9) / 1024 / 1024 * 1024 * 1024;
+        buffer_size = (int)std::min((uint32_t)buffer_size, max_buffer_size);
+    }
+
     buffer_size = std::min(buffer_size, count_mb * 1024 * 1024);
 
     ncnn::VkMat c(buffer_size, (size_t)1u, 1, allocator);
@@ -2323,6 +2330,13 @@ static double vkpeak_copy(int count_mb, int cmd_loop, int from_type, int to_type
         buffer_size = std::min(buffer_size, (size_t)128 * 1024 * 1024);
     }
 
+    // sanitize buffer_size for 0.9x hardware limits
+    {
+        const VkPhysicalDeviceProperties& p = vkdev->info.physicalDeviceProperties();
+        uint32_t max_buffer_size = (uint32_t)(p.limits.maxStorageBufferRange * 0.9) / 1024 / 1024 * 1024 * 1024;
+        buffer_size = std::min(buffer_size, (size_t)max_buffer_size);
+    }
+
     buffer_size = std::min(buffer_size, (size_t)count_mb * 1024 * 1024);
 
     double max_gbps = 0;
@@ -2501,7 +2515,7 @@ JNIEXPORT jstring JNICALL Java_com_tencent_vkpeakncnn_VkPeakNcnn_GetNcnnVersion(
     return env->NewStringUTF(NCNN_VERSION_STRING);
 }
 
-static bool is_adreno_6xx_or_7xx_series()
+static bool is_adreno_6xx_7xx_8xx_series()
 {
     ncnn::VulkanDevice* vkdev = ncnn::get_gpu_device();
 
@@ -2523,6 +2537,8 @@ static bool is_adreno_6xx_or_7xx_series()
                 return true;  // Adreno 6xx
             if (model >= 700 && model < 800)
                 return true;  // Adreno 7xx
+            if (model >= 800 && model < 900)
+                return true;  // Adreno 8xx
         }
     }
 
@@ -2539,16 +2555,16 @@ JNIEXPORT jboolean JNICALL Java_com_tencent_vkpeakncnn_VkPeakNcnn_IsVulkanSuppor
     if (type == 1)
     {
 #if __aarch64__
-        // turnip only supports adreno 6xx and 7xx
+        // turnip only supports adreno 6xx 7xx 8xx
         static bool g_inited = false;
-        static bool g_is_adreno_6xx_or_7xx_series = false;
+        static bool g_is_adreno_6xx_7xx_8xx_series = false;
         if (!g_inited)
         {
-            g_is_adreno_6xx_or_7xx_series = is_adreno_6xx_or_7xx_series();
+            g_is_adreno_6xx_7xx_8xx_series = is_adreno_6xx_7xx_8xx_series();
             g_inited = true;
         }
 
-        return g_is_adreno_6xx_or_7xx_series ? JNI_TRUE : JNI_FALSE;
+        return g_is_adreno_6xx_7xx_8xx_series ? JNI_TRUE : JNI_FALSE;
 #else
         return JNI_FALSE;
 #endif
