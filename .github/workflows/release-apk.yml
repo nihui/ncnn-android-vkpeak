@@ -20,7 +20,6 @@ jobs:
 
     - name: ndk-fix-debug
       run: |
-        sdkmanager "ndk;30.0.16248370"
         sed -i -e '/^  -g$/d' "${ANDROID_HOME}/ndk/30.0.16248370/build/cmake/android-legacy.toolchain.cmake"
 
     - name: vulkan-turnip-driver
