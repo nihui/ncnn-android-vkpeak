@@ -3,6 +3,7 @@ on: workflow_dispatch
 
 env:
   MESA_TURNIP_VERSION: 26.2.5
+  MOMOTEN_VERSION: 20261020
   BUILD_TOOLS_VERSION: 36.0.0
 
 jobs:
@@ -27,6 +28,33 @@ jobs:
         wget -q https://github.com/nihui/mesa-turnip-android-driver/releases/download/${MESA_TURNIP_VERSION}/mesa-turnip-android-${MESA_TURNIP_VERSION}.zip
         mkdir -p app/src/main/jniLibs/arm64-v8a
         unzip -q mesa-turnip-android-${MESA_TURNIP_VERSION}.zip -d app/src/main/jniLibs/arm64-v8a
+
+    - name: vulkan-momoten-driver
+      run: |
+        set -euo pipefail
+        mkdir -p app/src/main/assets/licenses/momoten
+        while read -r abi api sha256; do
+          archive="momoten-${MOMOTEN_VERSION}-android-${abi}-api${api}.zip"
+          curl -fL --retry 3 -o "$archive" "https://github.com/nihui/momoten/releases/download/${MOMOTEN_VERSION}/${archive}"
+          echo "$sha256  $archive" | sha256sum -c -
+          mkdir -p "app/src/main/jniLibs/${abi}"
+          unzip -p "$archive" lib/libmomoten.so > "app/src/main/jniLibs/${abi}/libmomoten.so"
+          test -s "app/src/main/jniLibs/${abi}/libmomoten.so"
+          for notice in LICENSE.txt THIRD_PARTY_NOTICES.md; do
+            unzip -p "$archive" "$notice" > "$notice"
+            test -s "$notice"
+            if [ -f "app/src/main/assets/licenses/momoten/$notice" ]; then
+              cmp "$notice" "app/src/main/assets/licenses/momoten/$notice"
+            else
+              cp "$notice" "app/src/main/assets/licenses/momoten/$notice"
+            fi
+          done
+        done <<'EOF'
+        arm64-v8a 21 b061c51a66e9658dfa2223b9203d190004f3ca6fbbfcbda6aea3f158106b4508
+        armeabi-v7a 14 fbc79b40e402d8a6d8a826c59e233f5d5308cb2977691c5217b15f33ccc7399f
+        x86 14 e69c1b3b7d25a56f854872906979208c38acc2d6549a9b9d318385d99280869f
+        x86_64 21 b954eb04cd8131bd8014054b3e5f26dbc300badce6b227e537187e5147fae696
+        EOF
 
     - name: build-apk
       run: |

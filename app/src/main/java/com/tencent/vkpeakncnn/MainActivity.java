@@ -26,12 +26,13 @@ import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.Spinner;
 import android.widget.TextView;
+import android.widget.Toast;
 
 public class MainActivity extends Activity
 {
     private VkPeakNcnn vkpeakncnn = new VkPeakNcnn();
 
-    private String[] vulkanItems = {"system driver", "mesa turnip"};
+    private String[] vulkanItems = {"system driver", "mesa turnip", "momoten"};
 
     private TextView textviewModel;
     private TextView textviewAndroid;
@@ -157,7 +158,7 @@ public class MainActivity extends Activity
         textviewCPd2d = (TextView) findViewById(R.id.textviewCPd2d);
 
         // apply default settings
-        spinnerVulkan.setSelection(0);
+        current_vulkan = vkpeakncnn.GetVulkanType();
         spinnerMacs.setSelection(0);
         spinnerCounts.setSelection(0);
         spinnerLoops.setSelection(0);
@@ -197,6 +198,7 @@ public class MainActivity extends Activity
             }
         };
         spinnerVulkan.setAdapter(adapter);
+        spinnerVulkan.setSelection(current_vulkan);
 
         spinnerVulkan.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
             @Override
@@ -204,8 +206,13 @@ public class MainActivity extends Activity
             {
                 if (position != current_vulkan)
                 {
-                    current_vulkan = position;
-                    vkpeakncnn.ResetVulkan(current_vulkan);
+                    boolean success = vkpeakncnn.ResetVulkan(position);
+                    current_vulkan = vkpeakncnn.GetVulkanType();
+                    spinnerVulkan.setSelection(current_vulkan);
+                    if (!success)
+                    {
+                        Toast.makeText(MainActivity.this, "Cannot initialize " + vulkanItems[position], Toast.LENGTH_LONG).show();
+                    }
 
                     textviewDevice.setText("  " + vkpeakncnn.GetVkDevice());
                     textviewAPI.setText("  " + vkpeakncnn.GetApiVersion());

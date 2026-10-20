@@ -21,7 +21,8 @@ public class VkPeakNcnn
     public native String GetNcnnVersion();
 
     public native boolean IsVulkanSupported(int type);
-    public native void ResetVulkan(int type);
+    public native int GetVulkanType();
+    public native boolean ResetVulkan(int type);
 
     public native String GetVkDevice();
     public native String GetApiVersion();

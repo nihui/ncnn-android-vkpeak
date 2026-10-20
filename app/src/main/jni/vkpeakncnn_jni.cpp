@@ -18,6 +18,7 @@
 
 #include <jni.h>
 
+#include <dlfcn.h>
 #include <float.h>
 #include <string>
 #include <vector>
@@ -28,6 +29,51 @@
 #include <gpu.h>
 #include <mat.h>
 #include <pipeline.h>
+
+// Driver indices match MainActivity's selector.
+static bool g_vulkan_ready = false;
+static int g_vulkan_type = 0;
+static bool g_turnip_supported = false;
+static bool g_momoten_available = false;
+
+static ncnn::VulkanDevice* get_vulkan_device()
+{
+    // ncnn retains its previous GPU count after a failed instance creation.
+    return g_vulkan_ready ? ncnn::get_gpu_device() : 0;
+}
+
+static bool is_momoten(const ncnn::GpuInfo& info)
+{
+    return strcmp(info.driver_name(), "momoten") == 0
+        || strncmp(info.device_name(), "momoten: ", 9) == 0;
+}
+
+static bool create_vulkan(int type)
+{
+    const char* driver_path = 0;
+    if (type == 1)
+        driver_path = "libvulkan_freedreno.so";
+    if (type == 2)
+        driver_path = "libmomoten.so";
+
+    g_vulkan_ready = false;
+    g_vulkan_type = 0;
+    if (ncnn::create_gpu_instance(driver_path) != 0 || ncnn::get_gpu_count() == 0)
+        return false;
+
+    ncnn::VulkanDevice* vkdev = ncnn::get_gpu_device();
+    if (!vkdev || !vkdev->is_valid())
+        return false;
+
+    g_vulkan_ready = true;
+    if (is_momoten(vkdev->info))
+        g_vulkan_type = 2;
+    else if (vkdev->info.driver_id() == VK_DRIVER_ID_MESA_TURNIP)
+        g_vulkan_type = 1;
+
+    // simplevk can silently fall back to another driver, even for an explicit path.
+    return type == 0 || g_vulkan_type == type;
+}
 
 #define REPEAT_1(...) #__VA_ARGS__
 #define REPEAT_2(...) REPEAT_1(__VA_ARGS__) REPEAT_1(__VA_ARGS__)
@@ -1489,11 +1535,11 @@ void main()
 
 static double vkpeak(int loop, int count_mb, int cmd_loop, int storage_type, int arithmetic_type, int packing_type)
 {
-    ncnn::VulkanDevice* vkdev = ncnn::get_gpu_device();
+    ncnn::VulkanDevice* vkdev = get_vulkan_device();
 
     if (!vkdev)
     {
-        return 0;
+        return -1;
     }
 
     if (!vkdev->info.support_fp16_storage() && storage_type == 1)
@@ -2301,11 +2347,11 @@ static double vkpeak(int loop, int count_mb, int cmd_loop, int storage_type, int
 
 static double vkpeak_copy(int count_mb, int cmd_loop, int from_type, int to_type)
 {
-    ncnn::VulkanDevice* vkdev = ncnn::get_gpu_device();
+    ncnn::VulkanDevice* vkdev = get_vulkan_device();
 
     if (!vkdev)
     {
-        return 0;
+        return -1;
     }
 
     ncnn::Option opt;
@@ -2482,13 +2528,53 @@ static double vkpeak_copy(int count_mb, int cmd_loop, int from_type, int to_type
     return max_gbps;
 }
 
+static bool is_adreno_6xx_7xx_8xx_series()
+{
+    ncnn::VulkanDevice* vkdev = get_vulkan_device();
+
+    if (vkdev && vkdev->info.vendor_id() == 0x5143)
+    {
+        // qcom
+        const char* device_name = vkdev->info.device_name();
+        if (!device_name)
+            return false;
+
+        // momoten prefixes the underlying OpenCL device name.
+        const char* adreno_name = strstr(device_name, "Adreno");
+        if (!adreno_name)
+            return false;
+
+        int model = 0;
+        if (sscanf(adreno_name, "Adreno (TM) %d", &model) == 1)
+        {
+            if (model >= 600 && model < 700)
+                return true;  // Adreno 6xx
+            if (model >= 700 && model < 800)
+                return true;  // Adreno 7xx
+            if (model >= 800 && model < 900)
+                return true;  // Adreno 8xx
+        }
+    }
+
+    return false;
+}
+
 extern "C" {
 
 JNIEXPORT jint JNI_OnLoad(JavaVM* vm, void* reserved)
 {
     __android_log_print(ANDROID_LOG_DEBUG, "VkPeakNcnn", "JNI_OnLoad");
 
-    ncnn::create_gpu_instance();
+    create_vulkan(0);
+    // Cache the system GPU before selecting another driver changes its name.
+    g_turnip_supported = is_adreno_6xx_7xx_8xx_series();
+
+    void* momoten = dlopen("libmomoten.so", RTLD_LOCAL | RTLD_NOW);
+    if (momoten)
+    {
+        g_momoten_available = dlsym(momoten, "vkGetInstanceProcAddr") != 0;
+        dlclose(momoten);
+    }
 
     return JNI_VERSION_1_4;
 }
@@ -2497,6 +2583,7 @@ JNIEXPORT void JNI_OnUnload(JavaVM* vm, void* reserved)
 {
     __android_log_print(ANDROID_LOG_DEBUG, "VkPeakNcnn", "JNI_OnUnload");
 
+    g_vulkan_ready = false;
     ncnn::destroy_gpu_instance();
 }
 
@@ -2515,36 +2602,6 @@ JNIEXPORT jstring JNICALL Java_com_tencent_vkpeakncnn_VkPeakNcnn_GetNcnnVersion(
     return env->NewStringUTF(NCNN_VERSION_STRING);
 }
 
-static bool is_adreno_6xx_7xx_8xx_series()
-{
-    ncnn::VulkanDevice* vkdev = ncnn::get_gpu_device();
-
-    if (vkdev && vkdev->info.vendor_id() == 0x5143)
-    {
-        // qcom
-        const char* device_name = vkdev->info.device_name();
-        if (!device_name)
-            return false;
-
-        // look for Adreno
-        if (strstr(device_name, "Adreno") == nullptr)
-            return false;
-
-        int model = 0;
-        if (sscanf(device_name, "Adreno (TM) %d", &model) == 1)
-        {
-            if (model >= 600 && model < 700)
-                return true;  // Adreno 6xx
-            if (model >= 700 && model < 800)
-                return true;  // Adreno 7xx
-            if (model >= 800 && model < 900)
-                return true;  // Adreno 8xx
-        }
-    }
-
-    return false;
-}
-
 // public native boolean IsVulkanSupported(int type);
 JNIEXPORT jboolean JNICALL Java_com_tencent_vkpeakncnn_VkPeakNcnn_IsVulkanSupported(JNIEnv *env, jobject thiz, jint type)
 {
@@ -2556,41 +2613,50 @@ JNIEXPORT jboolean JNICALL Java_com_tencent_vkpeakncnn_VkPeakNcnn_IsVulkanSuppor
     {
 #if __aarch64__
         // turnip only supports adreno 6xx 7xx 8xx
-        static bool g_inited = false;
-        static bool g_is_adreno_6xx_7xx_8xx_series = false;
-        if (!g_inited)
-        {
-            g_is_adreno_6xx_7xx_8xx_series = is_adreno_6xx_7xx_8xx_series();
-            g_inited = true;
-        }
-
-        return g_is_adreno_6xx_7xx_8xx_series ? JNI_TRUE : JNI_FALSE;
+        return g_turnip_supported ? JNI_TRUE : JNI_FALSE;
 #else
         return JNI_FALSE;
 #endif
     }
 
+    if (type == 2)
+    {
+        // OpenCL device availability is checked when the driver is selected.
+        return g_momoten_available ? JNI_TRUE : JNI_FALSE;
+    }
+
     return JNI_FALSE;
 }
 
-// public native void ResetVulkan(int type);
-JNIEXPORT void JNICALL Java_com_tencent_vkpeakncnn_VkPeakNcnn_ResetVulkan(JNIEnv *env, jobject thiz, jint type)
+// public native int GetVulkanType();
+JNIEXPORT jint JNICALL Java_com_tencent_vkpeakncnn_VkPeakNcnn_GetVulkanType(JNIEnv *env, jobject thiz)
 {
+    return g_vulkan_type;
+}
+
+// public native boolean ResetVulkan(int type);
+JNIEXPORT jboolean JNICALL Java_com_tencent_vkpeakncnn_VkPeakNcnn_ResetVulkan(JNIEnv *env, jobject thiz, jint type)
+{
+    if (type < 0 || type > 2)
+        return JNI_FALSE;
+
+    const int previous_type = g_vulkan_type;
+    g_vulkan_ready = false;
     ncnn::destroy_gpu_instance();
-    if (type == 0)
-    {
-        ncnn::create_gpu_instance();
-    }
-    if (type == 1)
-    {
-        ncnn::create_gpu_instance("libvulkan_freedreno.so");
-    }
+    if (create_vulkan(type))
+        return JNI_TRUE;
+
+    __android_log_print(ANDROID_LOG_ERROR, "VkPeakNcnn", "Cannot initialize Vulkan driver %d; restoring %d", type, previous_type);
+    g_vulkan_ready = false;
+    ncnn::destroy_gpu_instance();
+    create_vulkan(previous_type);
+    return JNI_FALSE;
 }
 
 // public native String GetVkDevice();
 JNIEXPORT jstring JNICALL Java_com_tencent_vkpeakncnn_VkPeakNcnn_GetVkDevice(JNIEnv* env, jobject thiz)
 {
-    ncnn::VulkanDevice* vkdev = ncnn::get_gpu_device();
+    ncnn::VulkanDevice* vkdev = get_vulkan_device();
     if (!vkdev)
     {
         return env->NewStringUTF("No vulkan device");
@@ -2602,7 +2668,7 @@ JNIEXPORT jstring JNICALL Java_com_tencent_vkpeakncnn_VkPeakNcnn_GetVkDevice(JNI
 // public native String GetApiVersion();
 JNIEXPORT jstring JNICALL Java_com_tencent_vkpeakncnn_VkPeakNcnn_GetApiVersion(JNIEnv* env, jobject thiz)
 {
-    ncnn::VulkanDevice* vkdev = ncnn::get_gpu_device();
+    ncnn::VulkanDevice* vkdev = get_vulkan_device();
     if (!vkdev)
     {
         return env->NewStringUTF("No vulkan device");
@@ -2619,7 +2685,7 @@ JNIEXPORT jstring JNICALL Java_com_tencent_vkpeakncnn_VkPeakNcnn_GetApiVersion(J
 // public native String GetDriverVersion();
 JNIEXPORT jstring JNICALL Java_com_tencent_vkpeakncnn_VkPeakNcnn_GetDriverVersion(JNIEnv* env, jobject thiz)
 {
-    ncnn::VulkanDevice* vkdev = ncnn::get_gpu_device();
+    ncnn::VulkanDevice* vkdev = get_vulkan_device();
     if (!vkdev)
     {
         return env->NewStringUTF("No vulkan device");
@@ -2629,7 +2695,12 @@ JNIEXPORT jstring JNICALL Java_com_tencent_vkpeakncnn_VkPeakNcnn_GetDriverVersio
     uint32_t driver_version = vkdev->info.driver_version();
 
     char tmp[128];
-    if (vendor_id == 0x10de)
+    if (is_momoten(vkdev->info))
+    {
+        // momoten encodes its release date as (year - 2000).month.day.
+        sprintf(tmp, "%04u%02u%02u", VK_VERSION_MAJOR(driver_version) + 2000, VK_VERSION_MINOR(driver_version), VK_VERSION_PATCH(driver_version));
+    }
+    else if (vendor_id == 0x10de)
     {
         // nvidia
         sprintf(tmp, "%u.%u.%u.%u", (driver_version >> 22) & 0x3ff, (driver_version >> 14) & 0x0ff, (driver_version >> 6) & 0x0ff, (driver_version) & 0x003f);
