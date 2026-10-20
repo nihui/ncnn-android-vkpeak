@@ -22,6 +22,14 @@ https://github.com/nihui/mesa-turnip-android-driver
 * Extract `libvulkan_freedreno.so` from mesa-turnip-android-XYZ.zip into **app/src/main/jniLibs/arm64-v8a**
 
 ### step3
+https://github.com/nihui/momoten/releases/tag/20261020
+
+* Download the momoten Android runtime zip for each ABI (`arm64-v8a`, `armeabi-v7a`, `x86`, `x86_64`).
+* Extract `lib/libmomoten.so` into **app/src/main/jniLibs/ABI** for the corresponding ABI.
+
+momoten requires an accessible OpenCL driver on the device.
+
+### step4
 open this project with Android Studio, build it and enjoy!
 
 ## screenshot
