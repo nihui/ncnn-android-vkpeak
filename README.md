@@ -31,7 +31,7 @@ https://github.com/nihui/momoten/releases/tag/20261020
   * `x86_64`: `momoten-20261020-android-x86_64-api21.zip`
 * Extract `lib/libmomoten.so` into **app/src/main/jniLibs/ABI/libmomoten.so** (replace ABI with the corresponding ABI above, without an extra `lib` directory).
 * Copy `LICENSE.txt` and `THIRD_PARTY_NOTICES.md` from one of the archives into **app/src/main/assets/licenses/momoten**.
-* The release workflow downloads all four archives, verifies their SHA-256 checksums, and bundles the libraries and notices automatically.
+* The release workflow downloads and extracts these files automatically.
 
 ### step4
 open this project with Android Studio, build it and enjoy!
