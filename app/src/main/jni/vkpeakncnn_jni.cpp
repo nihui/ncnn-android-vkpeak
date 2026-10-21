@@ -1530,7 +1530,8 @@ static double vkpeak(int loop, int count_mb, int cmd_loop, int storage_type, int
     {
         return 0;
     }
-    if (!vkdev->info.support_int8_arithmetic() && arithmetic_type == 6)
+    // Packed 4x8 dot products use 32-bit operands and do not require shaderInt8.
+    if (!vkdev->info.support_int8_arithmetic() && arithmetic_type == 6 && packing_type != 4)
     {
         return 0;
     }
@@ -2645,7 +2646,11 @@ JNIEXPORT jstring JNICALL Java_com_tencent_vkpeakncnn_VkPeakNcnn_GetVkDevice(JNI
         return env->NewStringUTF("No vulkan device");
     }
 
-    return env->NewStringUTF(vkdev->info.device_name());
+    const char* device_name = vkdev->info.device_name();
+    if (strncmp(device_name, "momoten: ", 9) == 0)
+        device_name += 9;
+
+    return env->NewStringUTF(device_name);
 }
 
 // public native String GetApiVersion();
