@@ -4,6 +4,11 @@
 
 The ncnn android vulkan peak FLOPS app
 
+## Android compatibility
+
+The app supports Android 5.0 (API 21) and later, but benchmarking requires a working Vulkan driver. Android 5.0 does not provide a system Vulkan driver.
+The bundled momoten runtimes support API 21, but still require an accessible, compatible OpenCL driver. The bundled Turnip driver has separate device and Android version requirements and cannot load on Android 5.0.
+
 ## download apk
 
 prebuild apk file can be download from release page
